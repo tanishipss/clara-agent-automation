@@ -1,55 +1,88 @@
 # Clara AI Agent Automation Pipeline
 
-## Overview
+![Python](https://img.shields.io/badge/Python-3.10-blue)
+![Streamlit](https://img.shields.io/badge/Dashboard-Streamlit-red)
+![Automation](https://img.shields.io/badge/Project-AI%20Automation-orange)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-This project builds an **automation pipeline that converts client call transcripts into deployable AI call-agent configurations**.
+Automation pipeline that converts **client call transcripts into deployable AI voice agent configurations**.
+
+---
+
+# Overview
+
+This project builds an **automation pipeline that processes service company call transcripts and generates structured AI agent configurations.**
 
 The system processes two types of calls:
 
-* **Demo Calls** → initial configuration extraction
-* **Onboarding Calls** → updates existing configurations
+• **Demo Calls** → initial configuration extraction
+• **Onboarding Calls** → updates existing configurations
 
-The pipeline automatically generates structured agent configurations, tracks changes between versions, and exposes results in an interactive dashboard.
+The pipeline automatically:
+
+* extracts structured configuration data
+* generates AI agent specifications
+* tracks configuration changes
+* visualizes results through a dashboard
 
 ---
 
-## Architecture
+# Architecture
 
 ```
-Demo Transcript
-      ↓
+Demo Call Transcript
+        ↓
 Transcript Parser
-      ↓
-Structured Memo
-      ↓
+        ↓
+Structured Memo (Account Configuration)
+        ↓
 Agent Spec Generator
-      ↓
-Agent Config v1
-      ↓
-Onboarding Transcript
-      ↓
-Update Extraction
-      ↓
+        ↓
+Agent Configuration v1
+
+------------------------------------------------
+
+Onboarding Call Transcript
+        ↓
+Update Extraction Engine
+        ↓
 Patch Engine
-      ↓
-Agent Config v2
-      ↓
+        ↓
+Agent Configuration v2
+
+------------------------------------------------
+
 Diff Generator
-      ↓
-Changelog + Dashboard
+        ↓
+Changelog + Conflict Detection
+        ↓
+Streamlit Dashboard
 ```
 
 ---
 
-## Features
+# Features
 
-### Automated Transcript Processing
+## Automated Transcript Processing
 
-Extracts structured configuration data from call transcripts.
+Extracts structured configuration data from conversation transcripts.
 
-### Explicit Unknown Handling
+Example extracted fields:
 
-The system avoids hallucination and explicitly reports missing information.
+```
+services_supported:
+- sprinkler service
+- fire alarm inspection
+
+business_hours:
+  value: "8-6"
+```
+
+---
+
+## Explicit Unknown Handling
+
+The system avoids hallucination and explicitly surfaces missing information.
 
 Example:
 
@@ -59,55 +92,87 @@ questions_or_unknowns:
 - emergency definition unclear
 ```
 
-### Configuration Versioning
+---
 
-Demo calls generate **v1 configurations**, onboarding updates create **v2**.
+## Configuration Versioning
+
+Demo calls generate **v1 configurations**.
+Onboarding calls generate **v2 updates**.
+
+Example output structure:
 
 ```
 outputs/accounts/account_01/
-  v1/
-  v2/
-  changelog.json
+
+   v1/
+      memo.json
+      agent_spec.json
+
+   v2/
+      memo.json
+      agent_spec.json
+
+   changelog.json
 ```
 
-### Conflict Detection
+---
 
-When onboarding contradicts demo configuration the system records the change.
+## Conflict Detection
+
+When onboarding updates contradict demo configurations the system logs the conflict.
 
 Example:
 
 ```
-conflict:
+conflicts:
  field: business_hours
- demo: 9-5
- onboarding: 8-4
+ demo_value: 9-5
+ onboarding_value: 8-4
  resolution: onboarding overrides
 ```
 
-### Dashboard Monitoring
+---
 
-A Streamlit dashboard provides visibility into:
+## Interactive Dashboard
 
-* Accounts processed
-* Missing configuration data
-* Generated agent configs
-* Version differences
+A **Streamlit dashboard** provides visibility into pipeline results.
+
+Dashboard shows:
+
+• Accounts processed
+• Missing configuration fields
+• Generated agent specifications
+• Version differences
+• Change logs
 
 ---
 
-## Project Structure
+# Project Structure
 
 ```
 clara-agent-automation
 │
 ├── dataset
+│   ├── demo_calls
+│   └── onboarding_calls
+│
 ├── scripts
+│   ├── transcript_parser.py
+│   ├── extract_demo_data.py
+│   ├── extract_onboarding_updates.py
+│   ├── agent_generator.py
+│   ├── patch_engine.py
+│   ├── diff_generator.py
+│   └── conflict_detector.py
+│
 ├── dashboard
+│   └── pipeline_dashboard.py
+│
 ├── config
 │
-├── run_all.py
 ├── run_demo_pipeline.py
 ├── run_onboarding_pipeline.py
+├── run_all.py
 │
 ├── requirements.txt
 └── README.md
@@ -115,9 +180,9 @@ clara-agent-automation
 
 ---
 
-## Installation
+# Quick Start
 
-Clone repository:
+Clone the repository:
 
 ```
 git clone https://github.com/tanishipss/clara-agent-automation.git
@@ -130,9 +195,7 @@ Create virtual environment:
 python -m venv venv
 ```
 
-Activate environment:
-
-Windows:
+Activate environment (Windows):
 
 ```
 venv\Scripts\activate
@@ -146,7 +209,9 @@ pip install -r requirements.txt
 
 ---
 
-## Run the Pipeline
+# Run the Automation Pipeline
+
+Run:
 
 ```
 python run_all.py
@@ -154,13 +219,15 @@ python run_all.py
 
 This will:
 
-1. Generate v1 configurations from demo calls
-2. Apply onboarding updates
-3. Generate changelog files
+1. Generate **v1 agent configurations from demo calls**
+2. Apply **onboarding updates**
+3. Generate **change logs and version differences**
 
 ---
 
-## Launch Dashboard
+# Launch Dashboard
+
+Run:
 
 ```
 streamlit run dashboard/pipeline_dashboard.py
@@ -174,17 +241,52 @@ http://localhost:8501
 
 ---
 
-## Technologies Used
+# Example Outputs
 
-* Python
-* Streamlit
-* DeepDiff
-* Rule-based text extraction
+Example memo:
+
+```
+services_supported:
+- sprinkler service
+- fire alarm service
+- inspection service
+```
+
+Example change log:
+
+```
+type_changes:
+ business_hours:
+  old_type: NoneType
+  new_type: dict
+```
 
 ---
 
-## Author
+# Technologies Used
 
-Tanisha Yadav
+• Python
+• Streamlit
+• DeepDiff
+• Rule-based text extraction
+
+---
+
+# Design Principles
+
+The system is designed with the following principles:
+
+* deterministic parsing
+* explicit handling of missing data
+* versioned configuration updates
+* transparent change tracking
+* idempotent pipeline execution
+
+---
+
+# Author
+
+**Tanisha Yadav**
+
 B.Tech Final Year
 Machine Learning / Software Engineering
