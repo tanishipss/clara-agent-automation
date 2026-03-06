@@ -1,15 +1,35 @@
 import streamlit as st
 import os
 import json
+from datetime import datetime
+
 
 BASE_PATH = "outputs/accounts"
+LOG_FILE = "logs/pipeline.log"
+
 
 st.title("Clara Automation Pipeline Dashboard")
 
-# Ensure outputs folder exists
+st.caption("AI Agent Configuration Automation Pipeline")
+
+
+# -------------------------------------
+# LAST PIPELINE RUN
+# -------------------------------------
+
+if os.path.exists(LOG_FILE):
+    last_run = datetime.fromtimestamp(os.path.getmtime(LOG_FILE))
+    st.caption(f"Last pipeline run: {last_run}")
+
+
+# -------------------------------------
+# CHECK OUTPUTS FOLDER
+# -------------------------------------
+
 if not os.path.exists(BASE_PATH):
     st.error("Outputs folder not found. Run the pipeline first.")
     st.stop()
+
 
 accounts = sorted(os.listdir(BASE_PATH))
 
@@ -17,9 +37,10 @@ processed_accounts = len(accounts)
 missing_data = 0
 configured_accounts = 0
 
-# -----------------------------
+
+# -------------------------------------
 # CALCULATE METRICS
-# -----------------------------
+# -------------------------------------
 
 for acc in accounts:
 
@@ -38,9 +59,9 @@ for acc in accounts:
             configured_accounts += 1
 
 
-# -----------------------------
+# -------------------------------------
 # PIPELINE METRICS
-# -----------------------------
+# -------------------------------------
 
 st.header("Pipeline Metrics")
 
@@ -50,15 +71,37 @@ col1.metric("Accounts Processed", processed_accounts)
 col2.metric("Configured Accounts", configured_accounts)
 col3.metric("Accounts Missing Info", missing_data)
 
-if missing_data > 0:
-    st.warning("Some accounts still have missing configuration fields.")
+
+# -------------------------------------
+# PIPELINE HEALTH
+# -------------------------------------
+
+if missing_data == 0:
+    st.success("Pipeline healthy: all accounts configured")
 else:
-    st.success("All accounts fully configured.")
+    st.warning("Pipeline warning: some accounts have missing configuration")
 
 
-# -----------------------------
+# -------------------------------------
+# CONFIGURATION COMPLETION RATE
+# -------------------------------------
+
+if processed_accounts > 0:
+
+    completion_rate = int(
+        (processed_accounts - missing_data) / processed_accounts * 100
+    )
+
+    st.subheader("Configuration Completion")
+
+    st.progress(completion_rate)
+
+    st.caption(f"{completion_rate}% of accounts configured")
+
+
+# -------------------------------------
 # MISSING DATA ALERTS
-# -----------------------------
+# -------------------------------------
 
 st.header("Missing Data Alerts")
 
@@ -77,22 +120,24 @@ for acc in accounts:
             st.warning(f"{acc} missing: {', '.join(missing)}")
 
 
-# -----------------------------
+# -------------------------------------
 # ACCOUNT EXPLORER
-# -----------------------------
+# -------------------------------------
 
 st.header("Account Explorer")
 
 selected = st.selectbox("Select Account", accounts)
+
 version = st.selectbox("Version", ["v1", "v2"])
+
 
 memo_path = f"{BASE_PATH}/{selected}/{version}/memo.json"
 agent_path = f"{BASE_PATH}/{selected}/{version}/agent_spec.json"
 
 
-# -----------------------------
+# -------------------------------------
 # ACCOUNT MEMO
-# -----------------------------
+# -------------------------------------
 
 st.subheader("Account Memo")
 
@@ -107,9 +152,9 @@ else:
     st.error("Memo file not found.")
 
 
-# -----------------------------
+# -------------------------------------
 # AGENT SPEC
-# -----------------------------
+# -------------------------------------
 
 st.subheader("Agent Spec")
 
@@ -124,9 +169,9 @@ else:
     st.error("Agent spec file not found.")
 
 
-# -----------------------------
+# -------------------------------------
 # CHANGELOG
-# -----------------------------
+# -------------------------------------
 
 changelog_path = f"{BASE_PATH}/{selected}/changelog.json"
 

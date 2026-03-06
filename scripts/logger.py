@@ -1,8 +1,15 @@
 import logging
+import os
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
 
-logger = logging.getLogger()
+def setup_logger():
+
+    os.makedirs("logs", exist_ok=True)
+
+    logging.basicConfig(
+        filename="logs/pipeline.log",
+        level=logging.INFO,
+        format="%(asctime)s - %(levelname)s - %(message)s"
+    )
+
+    return logging.getLogger()

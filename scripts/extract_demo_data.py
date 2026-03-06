@@ -1,116 +1,83 @@
 from scripts.transcript_parser import (
-    normalize,
     extract_services,
     extract_business_hours,
     extract_emergency
 )
 
-from scripts.llm_extractor import llm_extract
-from scripts.json_utils import safe_parse_json
+from scripts.missing_data_detector import detect_missing_fields
 
 
 def extract_demo_data(transcript, account_id):
+    """
+    Extract structured configuration data from demo call transcript.
+    """
 
-    text = normalize(transcript)
+    text = transcript.lower()
 
     memo = {
         "account_id": account_id,
-        "services_supported": [],
+        "company_name": None,
         "business_hours": None,
-        "emergency_definition": None,
+        "office_address": None,
+        "services_supported": [],
+        "emergency_definition": [],
+        "emergency_routing_rules": None,
+        "non_emergency_routing_rules": None,
+        "call_transfer_rules": None,
         "integration_constraints": [],
+        "after_hours_flow_summary": "",
+        "office_hours_flow_summary": "",
         "questions_or_unknowns": [],
         "notes": ""
     }
 
-    # -------------------------
-    # SERVICES
-    # -------------------------
+    # --------------------------------------------------
+    # Extract services
+    # --------------------------------------------------
 
     services = extract_services(text)
 
-    if services["value"]:
+    if services and services["value"]:
         memo["services_supported"] = services["value"]
 
-    else:
-
-        try:
-
-            llm_output = llm_extract(transcript)
-
-            data = safe_parse_json(llm_output)
-
-            memo["services_supported"] = data.get(
-                "services_supported", []
-            )
-
-        except Exception:
-            memo["questions_or_unknowns"].append(
-                "services not specified"
-            )
-
-    # -------------------------
-    # BUSINESS HOURS
-    # -------------------------
+    # --------------------------------------------------
+    # Extract business hours
+    # --------------------------------------------------
 
     hours = extract_business_hours(text)
 
     if hours:
+        memo["business_hours"] = {
+            "value": hours["value"],
+            "confidence": hours["confidence"],
+            "evidence": hours["evidence"]
+        }
 
-        memo["business_hours"] = hours
-
-    else:
-
-        try:
-
-            llm_output = llm_extract(transcript)
-
-            data = safe_parse_json(llm_output)
-
-            if "business_hours" in data:
-
-                memo["business_hours"] = {
-                    "value": data["business_hours"],
-                    "confidence": 0.6,
-                    "evidence": "llama extraction",
-                    "source": "llm"
-                }
-
-        except Exception:
-            memo["questions_or_unknowns"].append(
-                "business hours not specified"
-            )
-
-    # -------------------------
-    # EMERGENCY
-    # -------------------------
+    # --------------------------------------------------
+    # Extract emergency definitions
+    # --------------------------------------------------
 
     emergency = extract_emergency(text)
 
-    if emergency:
+    if emergency and emergency["value"]:
+        memo["emergency_definition"] = emergency["value"]
 
-        memo["emergency_definition"] = emergency
+    # --------------------------------------------------
+    # Detect integration systems
+    # --------------------------------------------------
 
-    else:
+    if "servicetrade" in text:
+        memo["integration_constraints"].append("ServiceTrade")
 
-        try:
+    if "jobber" in text:
+        memo["integration_constraints"].append("Jobber")
 
-            llm_output = llm_extract(transcript)
+    # --------------------------------------------------
+    # Missing data detection
+    # --------------------------------------------------
 
-            data = safe_parse_json(llm_output)
+    missing_fields = detect_missing_fields(memo)
 
-            if "emergency_definition" in data:
-
-                memo["emergency_definition"] = {
-                    "value": data["emergency_definition"],
-                    "confidence": 0.6,
-                    "evidence": "llama extraction",
-                    "source": "llm"
-                }
-
-        except Exception:
-            memo["questions_or_unknowns"].append(
-                "emergency definition unclear"
-            )
+    memo["questions_or_unknowns"] = missing_fields
 
     return memo
