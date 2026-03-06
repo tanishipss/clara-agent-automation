@@ -11,12 +11,12 @@ Automation pipeline that converts **client call transcripts into deployable AI v
 
 # Overview
 
-This project builds an **automation pipeline that processes service company call transcripts and generates structured AI agent configurations.**
+This project implements an **automation pipeline that processes service company call transcripts and generates structured AI agent configurations.**
 
 The system processes two types of calls:
 
-• **Demo Calls** → initial configuration extraction
-• **Onboarding Calls** → updates existing configurations
+* **Demo Calls** → initial configuration extraction
+* **Onboarding Calls** → updates existing configurations
 
 The pipeline automatically:
 
@@ -24,6 +24,30 @@ The pipeline automatically:
 * generates AI agent specifications
 * tracks configuration changes
 * visualizes results through a dashboard
+
+---
+
+# Quick Demo
+
+Run the full automation pipeline:
+
+```
+python run_all.py
+```
+
+Launch the dashboard:
+
+```
+streamlit run dashboard/pipeline_dashboard.py
+```
+
+Open the dashboard in your browser:
+
+```
+http://localhost:8501
+```
+
+The pipeline will process demo and onboarding transcripts and generate AI agent configurations automatically.
 
 ---
 
@@ -137,13 +161,13 @@ conflicts:
 
 A **Streamlit dashboard** provides visibility into pipeline results.
 
-Dashboard shows:
+The dashboard displays:
 
-• Accounts processed
-• Missing configuration fields
-• Generated agent specifications
-• Version differences
-• Change logs
+* accounts processed
+* missing configuration fields
+* generated agent specifications
+* version differences
+* change logs
 
 ---
 
@@ -180,7 +204,14 @@ clara-agent-automation
 
 ---
 
-# Quick Start
+# Requirements
+
+* Python 3.9+
+* pip
+
+---
+
+# Installation
 
 Clone the repository:
 
@@ -211,7 +242,7 @@ pip install -r requirements.txt
 
 # Run the Automation Pipeline
 
-Run:
+Run the pipeline:
 
 ```
 python run_all.py
@@ -221,19 +252,19 @@ This will:
 
 1. Generate **v1 agent configurations from demo calls**
 2. Apply **onboarding updates**
-3. Generate **change logs and version differences**
+3. Generate **change logs and configuration differences**
 
 ---
 
 # Launch Dashboard
 
-Run:
+Start the dashboard:
 
 ```
 streamlit run dashboard/pipeline_dashboard.py
 ```
 
-Open browser:
+Open:
 
 ```
 http://localhost:8501
@@ -265,18 +296,18 @@ type_changes:
 
 # Technologies Used
 
-• Python
-• Streamlit
-• DeepDiff
-• Rule-based text extraction
+* Python
+* Streamlit
+* DeepDiff
+* Rule-based text extraction
 
 ---
 
 # Design Principles
 
-The system is designed with the following principles:
+The pipeline is designed using the following principles:
 
-* deterministic parsing
+* deterministic parsing where possible
 * explicit handling of missing data
 * versioned configuration updates
 * transparent change tracking
