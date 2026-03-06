@@ -1,0 +1,16 @@
+{
+  "type_changes": {
+    "root['business_hours']": {
+      "old_type": "NoneType",
+      "new_type": "dict",
+      "old_value": null,
+      "new_value": {
+        "start": "8",
+        "end": "6"
+      }
+    }
+  },
+  "iterable_item_added": {
+    "root['integration_constraints'][0]": "ServiceTrade"
+  }
+}

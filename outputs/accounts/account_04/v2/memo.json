@@ -1,0 +1,24 @@
+{
+  "account_id": "account_04",
+  "company_name": null,
+  "business_hours": null,
+  "office_address": null,
+  "services_supported": [
+    "sprinkler service",
+    "inspection service",
+    "fire alarm service"
+  ],
+  "emergency_definition": [
+    "sprinkler leak"
+  ],
+  "emergency_routing_rules": null,
+  "non_emergency_routing_rules": null,
+  "call_transfer_rules": null,
+  "integration_constraints": [],
+  "after_hours_flow_summary": "",
+  "office_hours_flow_summary": "",
+  "questions_or_unknowns": [
+    "business hours not specified"
+  ],
+  "notes": ""
+}

@@ -1,0 +1,22 @@
+{
+  "account_id": "account_01",
+  "services_supported": [
+    "inspection service",
+    "fire alarm service",
+    "sprinkler service",
+    "maintenance service"
+  ],
+  "business_hours": null,
+  "emergency_definition": {
+    "value": [
+      "sprinkler leak"
+    ],
+    "confidence": 0.85,
+    "evidence": [
+      "sprinkler leak"
+    ]
+  },
+  "integration_constraints": [],
+  "questions_or_unknowns": [],
+  "notes": ""
+}
